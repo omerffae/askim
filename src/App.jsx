@@ -14,18 +14,30 @@ const App = () => {
     canvas.width = 500;
     canvas.height = 500;
     ctxRef.current = canvas.getContext("2d");
-    console.log("Sana aşığım gözde")
-    localStorage.setItem("Aşkım","Gözde")
+    console.log("Sana aşığım gözde");
+    localStorage.setItem("Aşkım", "Gözde");
 
     const handleMouseOver = () => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const buttonRect = noButtonRef.current.getBoundingClientRect();
+      const yesButtonRect = yesButtonRef.current.getBoundingClientRect();
 
       const maxX = containerRect.width - buttonRect.width;
       const maxY = containerRect.height - buttonRect.height;
 
-      const randomX = Math.random() * maxX;
-      const randomY = Math.random() * maxY;
+      let randomX, randomY;
+      let isOverlapping;
+
+      do {
+        randomX = Math.random() * maxX;
+        randomY = Math.random() * maxY;
+
+        isOverlapping =
+          randomX < yesButtonRect.right &&
+          randomX + buttonRect.width > yesButtonRect.left &&
+          randomY < yesButtonRect.bottom &&
+          randomY + buttonRect.height > yesButtonRect.top;
+      } while (isOverlapping);
 
       noButtonRef.current.style.position = "absolute";
       noButtonRef.current.style.left = `${randomX}px`;
@@ -33,7 +45,7 @@ const App = () => {
     };
 
     noButtonRef.current.addEventListener("mouseover", handleMouseOver);
-    
+
     return () => {
       noButtonRef.current?.removeEventListener("mouseover", handleMouseOver);
     };
@@ -55,10 +67,21 @@ const App = () => {
     }
 
     const draw = () => {
-      ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctxRef.current.clearRect(
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
       for (const particle of particles) {
         ctxRef.current.beginPath();
-        ctxRef.current.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctxRef.current.arc(
+          particle.x,
+          particle.y,
+          particle.radius,
+          0,
+          Math.PI * 2
+        );
         ctxRef.current.fillStyle = particle.color;
         ctxRef.current.fill();
         particle.x += Math.cos(particle.direction) * particle.speed;
@@ -78,7 +101,7 @@ const App = () => {
   return (
     <div>
       <h1 className="question">BENİMLE EVLENİR MİSİN ASKİMMMM</h1>
-      <div className="container" ref={containerRef}>
+      <div className="container" ref={containerRef} style={{ position: "relative", width: "500px", height: "500px" }}>
         {!isAccepted && (
           <>
             <button className="yes-button" ref={yesButtonRef} onClick={handleYesClick}>
